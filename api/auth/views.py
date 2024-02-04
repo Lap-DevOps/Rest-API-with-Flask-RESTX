@@ -1,8 +1,10 @@
-from flask_restx import Namespace, Resource, fields
 from http import HTTPStatus
 
+from flask_restx import Namespace, Resource, fields
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, create_refresh_token
+
 from api.models.user import User
-from werkzeug.security import generate_password_hash,check_password_hash
 
 auth_namespace = Namespace('auth', description='authentication related operations')
 
@@ -15,7 +17,6 @@ signup_model = auth_namespace.model(
         "password": fields.String(reaquired=True, description="Password"),
     })
 
-
 user_model = auth_namespace.model(
     "User",
     {
@@ -25,6 +26,14 @@ user_model = auth_namespace.model(
         'is_active': fields.Boolean(reaquired=True, description="Is active?"),
         'is_stuff': fields.Boolean(reaquired=True, description="Is stuff?")
 
+    }
+)
+
+login_model = auth_namespace.model(
+    "Login",
+    {
+        "email": fields.String(reaquired=True, description="Email"),
+        "password": fields.String(reaquired=True, description="Password"),
     }
 )
 
@@ -47,6 +56,19 @@ class Signup(Resource):
 
 @auth_namespace.route('/login/')
 class Login(Resource):
+    @auth_namespace.expect(login_model)
     def post(self):
         """Login a user"""
+
+        data = auth_namespace.payload
+        user = User.query.filter_by(email=data.get('email')).first_or_404()
+        if user:
+            if check_password_hash(user.password_hash, data.get('password')):
+                access_token = create_access_token(identity=user.username)
+                refresh_token = create_refresh_token(identity=user.username)
+                response = {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
+                return response, HTTPStatus.OK
         return {'message': 'login'}

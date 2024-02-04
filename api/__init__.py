@@ -1,6 +1,7 @@
 from flask import Flask
-from flask_restx import Api
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from flask_restx import Api
 
 from api.auth.views import auth_namespace
 from api.config.config import config_dict
@@ -13,6 +14,9 @@ from api.utils import db
 def create_app(config=config_dict['dev']):
     app = Flask(__name__)
     app.config.from_object(config)
+
+    jwt = JWTManager(app)
+
     api = Api(
         app=app,
         title="Flask REST API with Flask-RESTX",

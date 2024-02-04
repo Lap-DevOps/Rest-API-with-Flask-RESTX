@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource
 order_namespace = Namespace('orders', description='Orders related operations')
 
 
+
 @order_namespace.route('/')
 class OrderGetCreate(Resource):
     def get(self):

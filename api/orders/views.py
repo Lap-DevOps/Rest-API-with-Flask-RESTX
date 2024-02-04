@@ -46,5 +46,5 @@ class UserOdersList(Resource):
 @order_namespace.route('/order/status/<int:order_id>/')
 class UpdateOrderStatus(Resource):
     def patch(self, order_id):
-        """ Update order status """
+        """ Update an order status """
         return {'message': 'update order status'}

@@ -1,3 +1,5 @@
+"""Database models for User"""
+
 from api.utils import db
 
 

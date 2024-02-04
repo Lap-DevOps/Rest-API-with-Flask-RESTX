@@ -82,4 +82,4 @@ class Refresh(Resource):
         """Refresh token"""
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user)
-        return {'access_token': new_token}
+        return {'access_token': new_token}, HTTPStatus.OK

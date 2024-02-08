@@ -1,14 +1,33 @@
-from flask_restx import Namespace, Resource
+from http import HTTPStatus
+
+from flask_restx import Namespace, Resource, fields
+
+from api.models.order import Order
 
 order_namespace = Namespace('orders', description='Orders related operations')
 
+order_model = order_namespace.model(
+    "Order", {
+        "id": fields.Integer(reaquired=True, description="id"),
+        "size": fields.String(reaquired=True, description="size",
+                              enum=["SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE"]),
+        "order_status": fields.String(reaquired=True, description="order_status",
+                                      enum=["PENDING", "IN_TRANSIT", "DELIVERED", "CANCELLED"]),
+        "flavor": fields.String(reaquired=True, description="flavor"),
+        "customer": fields.String(reaquired=True, description="customer"),
+
+    }
+)
 
 
 @order_namespace.route('/')
 class OrderGetCreate(Resource):
+    @order_namespace.marshal_with(order_model)
     def get(self):
         """ Get all orders """
-        return {'message': 'orders'}
+        orders = Order.query.all()
+
+        return orders, HTTPStatus.OK
 
     def post(self):
         """ Place new order """

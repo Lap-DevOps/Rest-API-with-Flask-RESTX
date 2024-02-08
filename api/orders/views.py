@@ -29,9 +29,19 @@ class OrderGetCreate(Resource):
 
         return orders, HTTPStatus.OK
 
+    @order_namespace.expect(order_model)
+    @order_namespace.marshal_with(order_model)
     def post(self):
         """ Place new order """
-        return {'message': 'create order'}
+        data= order_namespace.payload
+        order=Order(
+            size=data.get('size'),
+            order_status=data.get('order_status'),
+            flavor=data.get('flavor'),
+            customer=data.get('customer'),
+        )
+        order.save()
+        return order, HTTPStatus.OK
 
 
 @order_namespace.route('/<int:order_id>/')

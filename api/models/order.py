@@ -32,3 +32,7 @@ class Order(db.Model):
 
     def __repr__(self):
         return f"Order(id={self.id}, user_id={self.user_id}, status={self.status})"
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()

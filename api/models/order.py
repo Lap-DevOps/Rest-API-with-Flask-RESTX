@@ -25,7 +25,8 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     size = db.Column(db.Enum(Sizes), nullable=False)
     order_status = db.Column(db.Enum(Status), nullable=False, default=Status.PENDING)
-    flavor = db.Column(db.String(80), nullable=False)
+    flavour = db.Column(db.String(80), nullable=False)
+    quantity = db.Column(db.Integer())
     date_created = db.Column(db.DateTime, nullable=False, default=db.func.now())
 
     customer = db.Column(db.Integer(), db.ForeignKey('users.id'))

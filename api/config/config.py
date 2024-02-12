@@ -24,6 +24,9 @@ class DevConfig(Config):
 
 class TestConfig(Config):
     TESTING = config('TESTING', default=True, cast=bool)
+    SQLALCHEMY_DATABASE_URI = "sqlite://"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = True
 
 
 class ProdConfig(Config):

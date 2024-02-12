@@ -3,6 +3,7 @@ from http import HTTPStatus
 from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, jwt_required
+from werkzeug.exceptions import Conflict, BadRequest
 
 from api.models.user import User
 
@@ -45,12 +46,15 @@ class Signup(Resource):
     def post(self):
         """Create a new user account"""
         data = auth_namespace.payload
-        new_user = User(
-            username=data.get('username'),
-            email=data.get('email'),
-            password_hash=generate_password_hash(data.get('password'), )
-        )
-        new_user.save()
+        try:
+            new_user = User(
+                username=data.get('username'),
+                email=data.get('email'),
+                password_hash=generate_password_hash(data.get('password'), )
+            )
+            new_user.save()
+        except Exception as e:
+            raise Conflict(f'User with this email =  {data.get("email")} already exists')
         return new_user, HTTPStatus.CREATED
 
 
@@ -71,7 +75,7 @@ class Login(Resource):
                     'refresh_token': refresh_token
                 }
                 return response, HTTPStatus.OK
-        return {'message': 'login'}
+        raise BadRequest('Invalid credentials')
 
 
 @auth_namespace.route('/refresh/')

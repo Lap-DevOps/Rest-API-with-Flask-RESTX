@@ -32,7 +32,7 @@ order_status_model = order_namespace.model(
 
 @order_namespace.route('/')
 class OrderGetCreate(Resource):
-    # @jwt_required()
+    @jwt_required()
     @order_namespace.marshal_list_with(order_model)
     def get(self):
         """ Get all orders """
@@ -122,6 +122,7 @@ class UserOrdersList(Resource):
 class UpdateOrderStatus(Resource):
     @jwt_required()
     @order_namespace.expect(order_status_model)
+    @order_namespace.marshal_with(order_model)
     def patch(self, order_id):
         """ Update an order status """
         data = order_namespace.payload

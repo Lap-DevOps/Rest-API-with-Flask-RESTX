@@ -10,15 +10,14 @@ from api.utils import db
 order_namespace = Namespace('orders', description='Orders related operations')
 
 order_model = order_namespace.model(
-    "Order", {
-        "id": fields.Integer(reaquired=True, description="id"),
-        "size": fields.String(reaquired=True, description="size",
-                              enum=["SMALL", "MEDIUM", "LARGE", "EXTRA_LARGE"]),
-        "order_status": fields.String(reaquired=True, description="order_status",
-                                      enum=["PENDING", "IN_TRANSIT", "DELIVERED", "CANCELLED"]),
-        "flavor": fields.String(reaquired=True, description="flavor"),
-        "customer": fields.String(reaquired=True, description="customer"),
-
+    'Order', {
+        'id': fields.Integer(description="An ID"),
+        'size': fields.String(description="Size of order", required=True,
+                              enum=['SMALL', 'MEDIUM', 'LARGE', 'EXTRA_LARGE']
+                              ),
+        'order_status': fields.String(description="The status of the Order",
+                                      required=True, enum=['PENDING', 'IN_TRANSIT', 'DELIVERED']
+                                      )
     }
 )
 
@@ -32,33 +31,47 @@ order_status_model = order_namespace.model(
 
 @order_namespace.route('/')
 class OrderGetCreate(Resource):
+
+    @order_namespace.marshal_with(order_model)
+    @order_namespace.doc(
+        description="Retrieve all orders"
+    )
     @jwt_required()
-    @order_namespace.marshal_list_with(order_model)
     def get(self):
-        """ Get all orders """
+        """
+            Get all orders
+        """
         orders = Order.query.all()
 
         return orders, HTTPStatus.OK
 
-    @jwt_required
     @order_namespace.expect(order_model)
     @order_namespace.marshal_with(order_model)
+    @order_namespace.doc(
+        description="Place an order"
+    )
+    @jwt_required()
     def post(self):
-        """ Place new order """
+        """
+            place a new order
+        """
 
         username = get_jwt_identity()
-        current_user = User.query.get(username=username)
+
+        current_user = User.query.filter_by(username=username).first()
 
         data = order_namespace.payload
+
         new_order = Order(
-            size=data.get('size'),
-            quantity=data.get('quantity'),
-            flavor=data.get('flavor'),
+            size=data['size'],
+            quantity=data['quantity'],
+            flavour=data['flavour']
         )
 
         new_order.user = current_user
 
         new_order.save()
+
         return new_order, HTTPStatus.CREATED
 
 

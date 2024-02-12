@@ -54,6 +54,7 @@ class OrderGetCreate(Resource):
 
 @order_namespace.route('/<int:order_id>/')
 class OrderGetUpdateDelete(Resource):
+    @jwt_required()
     @order_namespace.marshal_with(order_model)
     def get(self, order_id):
         """ Get an order by id """
@@ -77,10 +78,14 @@ class GetSpecificOrderByUser(Resource):
 
 
 @order_namespace.route('/user/<int:user_id>/orders/')
-class UserOdersList(Resource):
+class UserOrdersList(Resource):
+    @jwt_required()
+    @order_namespace.marshal_list_with(order_model)
     def get(self, user_id):
         """ Get all user's orders """
-        return {'message': 'get orders'}
+        user = User.get_user_by_id(user_id)
+        orders = user.orders
+        return orders, HTTPStatus.OK
 
 
 @order_namespace.route('/order/status/<int:order_id>/')

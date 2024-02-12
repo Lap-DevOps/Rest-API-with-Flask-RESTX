@@ -53,3 +53,8 @@ class Order(db.Model):
             The object with the specified ID, or None if not found.
         """
         return cls.query.get(id=id)
+
+    @classmethod
+    def delete(cls, id):
+        db.session.delete(id)
+        db.session.commit()

@@ -3,9 +3,9 @@ from http import HTTPStatus
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restx import Namespace, Resource, fields
 
-from api import db
 from api.models.order import Order
 from api.models.user import User
+from api.utils import db
 
 order_namespace = Namespace('orders', description='Orders related operations')
 
@@ -25,7 +25,8 @@ order_model = order_namespace.model(
 
 @order_namespace.route('/')
 class OrderGetCreate(Resource):
-    @order_namespace.marshal_with(order_model)
+    # @jwt_required()
+    @order_namespace.marshal_list_with(order_model)
     def get(self):
         """ Get all orders """
         orders = Order.query.all()
@@ -37,6 +38,7 @@ class OrderGetCreate(Resource):
     @order_namespace.marshal_with(order_model)
     def post(self):
         """ Place new order """
+
         username = get_jwt_identity()
         current_user = User.query.get(username=username)
 
@@ -61,6 +63,7 @@ class OrderGetUpdateDelete(Resource):
         """ Get an order by id """
         order = Order.get_by_id(order_id)
         return order, HTTPStatus.OK
+
     @jwt_required()
     @order_namespace.marshal_with(order_model)
     @order_namespace.expect(order_model)
@@ -75,9 +78,14 @@ class OrderGetUpdateDelete(Resource):
         db.session.commit()
         return order_to_update, HTTPStatus.OK
 
+    @jwt_required()
+    @order_namespace.marshal_with(order_model)
     def delete(self, order_id):
         """ Delete an order by id """
-        return {'message': 'delete order'}
+
+        order_to_delete = Order.get_by_id(order_id)
+        order_to_delete.delete()
+        return order_to_delete, HTTPStatus.OK
 
 
 @order_namespace.route('/user/<int:user_id>/order/<int:order_id>/')

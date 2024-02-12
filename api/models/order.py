@@ -34,5 +34,8 @@ class Order(db.Model):
         return f"Order(id={self.id}, user_id={self.user_id}, status={self.status})"
 
     def save(self):
+        """
+        Save the current object to the database using the current session.
+        """
         db.session.add(self)
         db.session.commit()

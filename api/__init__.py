@@ -18,12 +18,23 @@ def create_app(config=config_dict['dev']):
 
     jwt = JWTManager(app)
 
+    authorizations = {
+        "Bearer Auth": {
+            'type': "apiKey",
+            'in': 'header',
+            'name': "Authorization",
+            'description': "Add a JWT with ** Bearer &lt;JWT&gt; to authorize"
+        }
+    }
+
     api = Api(
         app=app,
         title="Flask REST API with Flask-RESTX",
         version="1.0",
         description="Simple REST API with Flask-RESTX",
         doc="/docs",
+        authorizations=authorizations,
+        security="Bearer Auth"
     )
     db.init_app(app)
     migrate = Migrate(app, db)

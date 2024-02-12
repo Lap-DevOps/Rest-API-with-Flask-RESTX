@@ -39,3 +39,17 @@ class Order(db.Model):
         """
         db.session.add(self)
         db.session.commit()
+
+    @classmethod
+    def get_by_id(cls, id):
+        """
+        Retrieve an object by its ID.
+
+        Args:
+            cls: The class itself.
+            id: The ID of the object to retrieve.
+
+        Returns:
+            The object with the specified ID, or None if not found.
+        """
+        return cls.query.get(id=id)

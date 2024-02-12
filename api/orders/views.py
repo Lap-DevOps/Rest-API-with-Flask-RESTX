@@ -46,7 +46,7 @@ class OrderGetCreate(Resource):
             flavor=data.get('flavor'),
         )
 
-        new_order.customer = current_user
+        new_order.user = current_user
 
         new_order.save()
         return new_order, HTTPStatus.CREATED
